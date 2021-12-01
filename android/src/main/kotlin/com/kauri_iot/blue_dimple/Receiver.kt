@@ -1,4 +1,4 @@
-package com.kauri_iot.bluetooth_debug
+package com.kauri_iot.blue_dimple
 
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver

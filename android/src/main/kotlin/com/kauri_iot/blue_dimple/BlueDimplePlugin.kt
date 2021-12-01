@@ -25,6 +25,8 @@ import java.lang.reflect.Method
 import kotlin.concurrent.thread
 import kotlin.math.abs
 import kotlin.random.Random
+import com.kauri_iot.blue_dimple.Receiver
+import java.io.OutputStream
 
 /** BlueDimplePlugin */
 
@@ -41,12 +43,12 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "blue_dimple")
+    context = flutterPluginBinding.applicationContext
     receiver = Receiver()
     liveData = receiver.device
-    manager = applicationContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     adapter = manager.adapter
     registerBroadcastReceiver()
-    context = flutterPluginBinding.applicationContext
     channel.setMethodCallHandler(this)
   }
 
@@ -79,7 +81,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
 
   private fun connect() {
     val boundedDevices = adapter.bondedDevices.toList()
-    val device = boundedDevices.first { it.address == mac }
+    val device = boundedDevices.first { it -> it.address == mac }
     val method = device.javaClass.getMethod("createInsecureRfcommSocket", Int::class.java)
     val deviceSocket = method.invoke(device, 1) as BluetoothSocket
     deviceSocket.connect()
@@ -87,12 +89,12 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
   }
 
   private fun pair(mac: String) {
-    if (adapter.bondedDevices.any { it.address == mac }) {
+    if (adapter.bondedDevices.any { it -> it.address == mac }) {
       logger.log(Level.INFO, "Already paired.")
       return
     }
     adapter.startDiscovery()
-    liveData.observe(this, {
+    liveData.observe(this, { it ->
       if (it.address == mac) {
         val method: Method = it.javaClass.getMethod("createBond")
         method.invoke(it)
