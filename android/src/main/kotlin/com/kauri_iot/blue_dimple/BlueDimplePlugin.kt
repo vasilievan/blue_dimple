@@ -38,6 +38,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
   private lateinit var adapter: BluetoothAdapter
   private lateinit var liveData: MutableLiveData<BluetoothDevice>
   private lateinit var context : Context
+  private lateinit var flutterEngine: FlutterEngine
   private var mac = ""
   private var outputStream : OutputStream? = null
 
@@ -49,6 +50,8 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
     manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     adapter = manager.adapter
     registerBroadcastReceiver()
+    flutterEngine = FlutterEngine(context, null)
+    flutterEngine.getBroadcastReceiverControlSurface().attachToBroadcastReceiver(this, receiver);
     channel.setMethodCallHandler(this)
   }
 
@@ -104,22 +107,9 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
     logger.log(Level.INFO, "Pairing is started.")
   }
 
-  private fun registerBroadcastReceiver() {
-    val filter = IntentFilter()
-    filter.addAction(BluetoothDevice.ACTION_FOUND)
-    filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
-    context.registerReceiver(
-      receiver, filter
-    )
-  }
-
-  private fun unregisterBroadcastReceiver() {
-    context.unregisterReceiver(receiver)
-  }
-
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    flutterEngine.getBroadcastReceiverControlSurface().detachFromBroadcastReceiver();
     channel.setMethodCallHandler(null)
-    unregisterBroadcastReceiver()
   }
 
   private fun writeBytes(bytes: ByteArray) {
