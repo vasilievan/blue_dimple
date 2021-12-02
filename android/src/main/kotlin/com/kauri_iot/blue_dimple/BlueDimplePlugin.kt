@@ -69,7 +69,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    activity = binding.activtity;
+    this.activity = binding.activtity;
     lifecycleOwner = binding.activity as LifecycleOwner;
   }
 
