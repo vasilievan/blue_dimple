@@ -31,6 +31,9 @@ import com.kauri_iot.blue_dimple.Receiver
 import java.io.OutputStream
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import android.app.Activity
+
 
 /** BlueDimplePlugin */
 
