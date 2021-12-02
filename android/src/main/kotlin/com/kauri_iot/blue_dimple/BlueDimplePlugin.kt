@@ -32,7 +32,7 @@ import java.io.OutputStream
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
-import android.app.Activity
+import androidx.lifecycle.LifecycleOwner
 
 /** BlueDimplePlugin */
 
