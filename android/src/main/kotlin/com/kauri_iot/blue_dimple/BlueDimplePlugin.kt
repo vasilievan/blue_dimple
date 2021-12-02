@@ -14,25 +14,19 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.content.Context
-import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.MutableLiveData
 import java.lang.reflect.Method
-import kotlin.concurrent.thread
-import kotlin.math.abs
-import kotlin.random.Random
 import com.kauri_iot.blue_dimple.Receiver
-import java.io.OutputStream
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import androidx.lifecycle.LifecycleOwner
+import android.content.Intent
 
 /** BlueDimplePlugin */
 
@@ -46,8 +40,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   private lateinit var context : Context
   private lateinit var flutterEngine: FlutterEngine
   private lateinit var lifecycleOwner: LifecycleOwner
-  private var mac = ""
-  private var outputStream : OutputStream? = null
+  private lateinit var activity: Activity
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "blue_dimple")
@@ -61,10 +54,8 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
       object : Lifecycle() {
         override fun addObserver(observer: LifecycleObserver) {
         }
-
         override fun removeObserver(observer: LifecycleObserver) {
         }
-
         override fun getCurrentState(): State {
           return State.RESUMED;
         }
@@ -77,41 +68,27 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    activity = binding.activtity;
     lifecycleOwner = binding.activity as LifecycleOwner;
   }
 
   override fun onDetachedFromActivityForConfigChanges() {}
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    if (call.method == "getPlatformVersion") {
-      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-    } else if (call.method == "connect") {
-      connect()
-    } else if (call.method == "pair") {
-      val mac: String = call.arguments as String
-      this.mac = mac
-      pair(mac)
-    } else if (call.method == "isBluetoothEnabled") {
+    if (call.method == "isBluetoothEnabled") {
       result.success(isBluetoothEnabled())
-    } else if (call.method == "isPaired") {
-      val mac: String = call.arguments as String
-      result.success(isPaired(mac))
-    } else if (call.method == "writeBytes") {
-      val list: List<Int> = call.arguments as List<Int>
-      val bytes: ByteArray = ByteArray(list.size)
-      for (index in list.indices) {
-        bytes[index] = list[index].toByte()
-      }
-      if (outputStream != null) {
-        writeBytes(bytes)
-        result.success(true)
-      }
-      result.success(false)
-    } else if (call.method == "closeOutputStream") {
-      closeOutputStream();
+    } else if (call.method == "sendDataToDevice") {
+      val mac: String = call.arguments[0] as String
+      val ip: String = call.arguments[1] as String
+      val password: String = call.arguments[2] as String
+      result.success(sendDataToDevice(mac, ip, password))
     } else {
       result.notImplemented()
     }
+  }
+
+  private fun sendDataToDevice(mac: String, ip: String, password: String) {
+    pair(mac);
   }
 
   private fun isBluetoothEnabled(): Boolean {
@@ -125,15 +102,6 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
     }
   }
 
-  private fun connect() {
-    val boundedDevices = adapter.bondedDevices.toList()
-    val device = boundedDevices.first { it -> it.address == mac }
-    val method = device.javaClass.getMethod("createInsecureRfcommSocket", Int::class.java)
-    val deviceSocket = method.invoke(device, 1) as BluetoothSocket
-    deviceSocket.connect()
-    outputStream = deviceSocket.outputStream
-  }
-
   private fun isPaired(mac: String): Boolean {
     if (adapter.bondedDevices.any { it -> it.address == mac }) {
       return true;
@@ -142,8 +110,12 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   }
 
   private fun pair(mac: String) {
-    if (adapter.bondedDevices.any { it -> it.address == mac }) {
-      logger.log(Level.INFO, "Already paired.")
+    if (isPaired(mac)) {
+      val intent = Intent();
+      intent.action = BluetoothDevice.ACTION_BOND_STATE_CHANGED;
+      intent.putExtra(BluetoothDevice.EXTRA_BOND_STATE, 12);
+      activity.sendBroadcast(intent);
+      return
     }
     adapter.startDiscovery()
     liveData.observe(lifecycleOwner, { it ->
@@ -159,14 +131,5 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     flutterEngine.getBroadcastReceiverControlSurface().detachFromBroadcastReceiver();
     channel.setMethodCallHandler(null)
-  }
-
-  private fun writeBytes(bytes: ByteArray) {
-    outputStream!!.write(bytes)
-    outputStream!!.flush()
-  }
-
-  private fun closeOutputStream() {
-    outputStream!!.close()
   }
 }
