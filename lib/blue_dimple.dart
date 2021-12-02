@@ -11,19 +11,27 @@ class BlueDimple {
     return version;
   }
 
-  static void connect() async {
+  void connect() async {
     await _channel.invokeMethod('connect');
   }
 
-  static void pair(String mac) async {
+  Future<bool> isBluetoothEnabled() async {
+    bool result = false;
+    try {
+      result = await _channel.invokeMethod('isBluetoothEnabled');
+    } on PlatformException catch (e) {}
+    return result;
+  }
+
+  void pair(String mac) async {
     await _channel.invokeMethod('pair');
   }
 
-  static void closeOutputStream() async {
+  void closeOutputStream() async {
     await _channel.invokeMethod('closeOutputStream');
   }
 
-  static Future<bool> writeBytes() async {
+  Future<bool> writeBytes() async {
     final bool res = await _channel.invokeMethod('getPlatformVersion');
     return res;
   }

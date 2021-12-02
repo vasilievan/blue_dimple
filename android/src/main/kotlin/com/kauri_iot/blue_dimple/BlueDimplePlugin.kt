@@ -91,6 +91,8 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
       val mac: String = call.arguments as String
       this.mac = mac
       pair(mac)
+    } else if (call.method == "isBluetoothEnabled") {
+      result.success(isBluetoothEnabled())
     } else if (call.method == "writeBytes") {
       val list: List<Int> = call.arguments as List<Int>
       val bytes: ByteArray = ByteArray(list.size)
@@ -106,6 +108,17 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
       closeOutputStream();
     } else {
       result.notImplemented()
+    }
+  }
+
+  private fun isBluetoothEnabled(): Boolean {
+    val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    if (manager == null) {
+      return false;
+    } else if (manager.adapter.isEnabled) {
+      return true;
+    } else {
+      return false;
     }
   }
 
