@@ -20,6 +20,8 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.MutableLiveData
 import java.lang.reflect.Method
 import kotlin.concurrent.thread
@@ -51,7 +53,18 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
     manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     adapter = manager.adapter
     flutterEngine = FlutterEngine(context, null)
-    flutterEngine.getBroadcastReceiverControlSurface().attachToBroadcastReceiver(receiver, null);
+    flutterEngine.getBroadcastReceiverControlSurface().attachToBroadcastReceiver(receiver,
+      object : Lifecycle() {
+        override fun addObserver(observer: LifecycleObserver) {
+        }
+
+        override fun removeObserver(observer: LifecycleObserver) {
+        }
+
+        override fun getCurrentState(): State {
+          return State.RESUMED;
+        }
+      });
     channel.setMethodCallHandler(this)
   }
 
