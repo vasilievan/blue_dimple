@@ -110,7 +110,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
       return
     }
     adapter.startDiscovery()
-    liveData.observe(context, { it ->
+    liveData.observe(flutterEngine, { it ->
       if (it.address == mac) {
         val method: Method = it.javaClass.getMethod("createBond")
         method.invoke(it)
@@ -133,7 +133,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
   @RequiresApi(Build.VERSION_CODES.S)
   private fun askForPermissions() {
     if (ActivityCompat.checkSelfPermission(
-        this,
+        context,
         android.Manifest.permission.ACCESS_FINE_LOCATION
       ) !=
       PackageManager.PERMISSION_GRANTED
