@@ -125,7 +125,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
       return
     }
     adapter.startDiscovery()
-    liveData.observe(activity.getBroadcastReceiverControlSurface(), { it ->
+    liveData.observe(activity, { it ->
       if (it.address == mac) {
         val method: Method = it.javaClass.getMethod("createBond")
         method.invoke(it)
