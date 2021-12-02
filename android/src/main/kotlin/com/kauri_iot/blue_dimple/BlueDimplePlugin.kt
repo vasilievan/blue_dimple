@@ -130,26 +130,6 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
     outputStream!!.flush()
   }
 
-  private fun askForPermissions() {
-    if (ActivityCompat.checkSelfPermission(
-        context,
-        android.Manifest.permission.ACCESS_FINE_LOCATION
-      ) !=
-      PackageManager.PERMISSION_GRANTED
-    ) {
-      requestPermissions(
-        arrayOf(
-          android.Manifest.permission.ACCESS_FINE_LOCATION,
-          android.Manifest.permission.ACCESS_COARSE_LOCATION,
-          android.Manifest.permission.BLUETOOTH,
-          android.Manifest.permission.BLUETOOTH_ADMIN
-        ),
-        abs(Random.nextInt())
-      )
-      return
-    }
-  }
-
   private fun closeOutputStream() {
     outputStream!!.close()
   }
