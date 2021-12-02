@@ -51,7 +51,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
     manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     adapter = manager.adapter
     flutterEngine = FlutterEngine(context, null)
-    flutterEngine.getBroadcastReceiverControlSurface().attachToBroadcastReceiver(this, receiver);
+    flutterEngine.getBroadcastReceiverControlSurface().attachToBroadcastReceiver(receiver, null);
     channel.setMethodCallHandler(this)
   }
 
