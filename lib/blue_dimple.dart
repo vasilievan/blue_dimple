@@ -15,7 +15,7 @@ class BlueDimple {
     await _channel.invokeMethod('connect');
   }
 
-  static void pair() async {
+  static void pair(String mac) async {
     await _channel.invokeMethod('pair');
   }
 
