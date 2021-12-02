@@ -69,7 +69,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    this.activity = binding.activtity;
+    activity = binding.activity;
     lifecycleOwner = binding.activity as LifecycleOwner;
   }
 
@@ -115,7 +115,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
       val intent = Intent();
       intent.action = BluetoothDevice.ACTION_BOND_STATE_CHANGED;
       intent.putExtra(BluetoothDevice.EXTRA_BOND_STATE, 12);
-      this.activity.sendBroadcast(intent);
+      activity.sendBroadcast(intent);
       return
     }
     adapter.startDiscovery()
