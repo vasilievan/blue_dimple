@@ -115,7 +115,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
       val intent = Intent();
       intent.action = BluetoothDevice.ACTION_BOND_STATE_CHANGED;
       intent.putExtra(BluetoothDevice.EXTRA_BOND_STATE, 12);
-      activity.sendBroadcast(intent);
+      this.activity.sendBroadcast(intent);
       return
     }
     adapter.startDiscovery()
