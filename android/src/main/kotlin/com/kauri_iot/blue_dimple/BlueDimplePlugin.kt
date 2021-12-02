@@ -27,6 +27,7 @@ import kotlin.math.abs
 import kotlin.random.Random
 import com.kauri_iot.blue_dimple.Receiver
 import java.io.OutputStream
+import io.flutter.embedding.engine.FlutterEngine
 
 /** BlueDimplePlugin */
 
@@ -49,7 +50,6 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
     liveData = receiver.device
     manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     adapter = manager.adapter
-    registerBroadcastReceiver()
     flutterEngine = FlutterEngine(context, null)
     flutterEngine.getBroadcastReceiverControlSurface().attachToBroadcastReceiver(this, receiver);
     channel.setMethodCallHandler(this)
