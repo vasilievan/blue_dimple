@@ -23,6 +23,14 @@ class BlueDimple {
     return result;
   }
 
+  Future<bool> isPaired(String mac) async {
+    bool result = false;
+    try {
+      result = await _channel.invokeMethod('isPaired');
+    } on PlatformException catch (e) {}
+    return result;
+  }
+
   void pair(String mac) async {
     await _channel.invokeMethod('pair');
   }

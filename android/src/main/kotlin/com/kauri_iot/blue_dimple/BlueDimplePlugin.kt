@@ -93,6 +93,9 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
       pair(mac)
     } else if (call.method == "isBluetoothEnabled") {
       result.success(isBluetoothEnabled())
+    } else if (call.method == "isPaired") {
+      val mac: String = call.arguments as String
+      result.success(isPaired(mac))
     } else if (call.method == "writeBytes") {
       val list: List<Int> = call.arguments as List<Int>
       val bytes: ByteArray = ByteArray(list.size)
@@ -131,10 +134,16 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
     outputStream = deviceSocket.outputStream
   }
 
+  private fun isPaired(mac: String): Boolean {
+    if (adapter.bondedDevices.any { it -> it.address == mac }) {
+      return true;
+    }
+    return false;
+  }
+
   private fun pair(mac: String) {
     if (adapter.bondedDevices.any { it -> it.address == mac }) {
       logger.log(Level.INFO, "Already paired.")
-      return
     }
     adapter.startDiscovery()
     liveData.observe(lifecycleOwner, { it ->
