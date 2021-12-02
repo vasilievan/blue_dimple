@@ -34,7 +34,6 @@ import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import android.app.Activity
 
-
 /** BlueDimplePlugin */
 
 class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
@@ -46,7 +45,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   private lateinit var liveData: MutableLiveData<BluetoothDevice>
   private lateinit var context : Context
   private lateinit var flutterEngine: FlutterEngine
-  private lateinit var activity: Activity
+  private lateinit var lifecycleOwner: LifecycleOwner
   private var mac = ""
   private var outputStream : OutputStream? = null
 
@@ -78,7 +77,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    activity = binding.activity;
+    lifecycleOwner = binding.activity as LifecycleOwner;
   }
 
   override fun onDetachedFromActivityForConfigChanges() {}
@@ -125,7 +124,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
       return
     }
     adapter.startDiscovery()
-    liveData.observe(activity.lifecycleScope, { it ->
+    liveData.observe(lifecycleOwner, { it ->
       if (it.address == mac) {
         val method: Method = it.javaClass.getMethod("createBond")
         method.invoke(it)
