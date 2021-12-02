@@ -79,10 +79,10 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
     if (call.method == "isBluetoothEnabled") {
       result.success(isBluetoothEnabled())
     } else if (call.method == "sendDataToDevice") {
-      val mac: String = call.argument("mac") as String
-      val ip: String = call.argument("ip") as String
-      val password: String = call.argument("password") as String
-      result.success(sendDataToDevice(mac, ip, password))
+      val mac: String = call.argument("mac") as String?
+      val ip: String = call.argument("ip") as String?
+      val password: String = call.argument("password") as String?
+      result.success(sendDataToDevice(mac!!, ip!!, password!!))
     } else {
       result.notImplemented()
     }
