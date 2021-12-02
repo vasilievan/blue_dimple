@@ -94,7 +94,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
       return
     }
     adapter.startDiscovery()
-    liveData.observe(this, { it ->
+    liveData.observe(context, { it ->
       if (it.address == mac) {
         val method: Method = it.javaClass.getMethod("createBond")
         method.invoke(it)
@@ -108,13 +108,13 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
     val filter = IntentFilter()
     filter.addAction(BluetoothDevice.ACTION_FOUND)
     filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
-    this.registerReceiver(
+    context.registerReceiver(
       receiver, filter
     )
   }
 
   private fun unregisterBroadcastReceiver() {
-    this.unregisterReceiver(receiver)
+    context.unregisterReceiver(receiver)
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
