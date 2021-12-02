@@ -14,7 +14,7 @@ class BlueDimple {
     return result;
   }
 
-  Future<bool> sendDataToDevice(String mac, List<int> data) async {
+  Future<bool> sendDataToDevice(String mac, String ip, String password) async {
     bool result = false;
     try {
       result = await _channel.invokeMethod('sendDataToDevice');
