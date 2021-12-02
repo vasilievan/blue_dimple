@@ -27,6 +27,7 @@ import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import androidx.lifecycle.LifecycleOwner
 import android.content.Intent
+import android.app.Activity
 
 /** BlueDimplePlugin */
 
