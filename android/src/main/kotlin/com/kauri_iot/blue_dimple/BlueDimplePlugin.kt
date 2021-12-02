@@ -30,10 +30,11 @@ import kotlin.random.Random
 import com.kauri_iot.blue_dimple.Receiver
 import java.io.OutputStream
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
 
 /** BlueDimplePlugin */
 
-class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
+class BlueDimplePlugin: FlutterPlugin, MethodCallHandler, ActivityAware  {
   private lateinit var channel : MethodChannel
   private val logger: Logger = Logger.getLogger(BlueDimplePlugin::javaClass.name)
   private lateinit var receiver: Receiver
@@ -42,6 +43,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
   private lateinit var liveData: MutableLiveData<BluetoothDevice>
   private lateinit var context : Context
   private lateinit var flutterEngine: FlutterEngine
+  private lateinit var activity: Activity
   private var mac = ""
   private var outputStream : OutputStream? = null
 
@@ -67,6 +69,16 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
       });
     channel.setMethodCallHandler(this)
   }
+
+  override fun onDetachedFromActivity() {}
+
+  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
+
+  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    activity = binding.activity;
+  }
+
+  override fun onDetachedFromActivityForConfigChanges() {}
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     if (call.method == "getPlatformVersion") {
@@ -110,7 +122,7 @@ class BlueDimplePlugin: FlutterPlugin, MethodCallHandler {
       return
     }
     adapter.startDiscovery()
-    liveData.observe(flutterEngine.getBroadcastReceiverControlSurface(), { it ->
+    liveData.observe(activity.getBroadcastReceiverControlSurface(), { it ->
       if (it.address == mac) {
         val method: Method = it.javaClass.getMethod("createBond")
         method.invoke(it)
