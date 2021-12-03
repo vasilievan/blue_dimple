@@ -24,7 +24,7 @@ class Receiver : BroadcastReceiver() {
             if (state == 12) {
                 thread {
                     logger.log(Level.INFO, "Paired.")
-                    connect(mac, context)
+                    connect(mac, context!!)
                     writeBytes(byteArrayOf(1, 2))
                     Thread.sleep(2000)
                     closeOutputStream()
