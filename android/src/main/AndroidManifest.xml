@@ -12,4 +12,15 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
+    <application
+        android:name="io.flutter.app.FlutterApplication">
+        <receiver
+            android:exported="true"
+            android:name=".Receiver">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.BOND_STATE_CHANGED" />
+                <action android:name="android.bluetooth.device.action.FOUND" />
+            </intent-filter>
+        </receiver>
+    </application>
 </manifest>
