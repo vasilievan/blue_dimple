@@ -1,6 +1,7 @@
 package com.kauri_iot.blue_dimple
 
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -18,10 +19,11 @@ class Receiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
             val state = intent?.extras?.get(BluetoothDevice.EXTRA_BOND_STATE) as Int
+            val mac = intent?.extras?.get("mac") as String
             if (state == 12) {
                 thread {
                     logger.log(Level.INFO, "Paired.")
-                    connect()
+                    connect(mac)
                     writeBytes(byteArrayOf(1, 2))
                     Thread.sleep(2000)
                     closeOutputStream()
@@ -34,7 +36,9 @@ class Receiver : BroadcastReceiver() {
         }
     }
 
-    private fun connect() {
+    private fun connect(mac: String) {
+        val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val adapter = manager.adapter
         val boundedDevices = adapter.bondedDevices.toList()
         val device = boundedDevices.first { it -> it.address == mac }
         val method = device.javaClass.getMethod("createInsecureRfcommSocket", Int::class.java)
