@@ -2,6 +2,7 @@ package com.kauri_iot.blue_dimple
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import android.bluetooth.BluetoothManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -23,7 +24,7 @@ class Receiver : BroadcastReceiver() {
             if (state == 12) {
                 thread {
                     logger.log(Level.INFO, "Paired.")
-                    connect(mac)
+                    connect(mac, context)
                     writeBytes(byteArrayOf(1, 2))
                     Thread.sleep(2000)
                     closeOutputStream()
@@ -36,7 +37,7 @@ class Receiver : BroadcastReceiver() {
         }
     }
 
-    private fun connect(mac: String) {
+    private fun connect(mac: String, context: Context) {
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val adapter = manager.adapter
         val boundedDevices = adapter.bondedDevices.toList()
